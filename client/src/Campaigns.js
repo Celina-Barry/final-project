@@ -32,6 +32,17 @@ const ItemLink = styled.a`
         background-color: #0056b3;
     }
 `;
+const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+};
+
+const formatTime = (isoString) => {
+    const date = new Date(isoString);
+    const options = { hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleTimeString(undefined, options);
+};
 
 const Campaigns = () => {
     const loginEmail = localStorage.getItem('loginEmail');
@@ -61,7 +72,8 @@ const Campaigns = () => {
             {meetings.map(meeting => (
                 <ItemBox key={meeting.id}>
                     <ItemName>{meeting.topic}</ItemName>
-                    <p>Date: {meeting.start_time}</p>
+                    <p>Date: {formatDate(meeting.start_time)}</p>
+                    <p>Time: {formatTime(meeting.start_time)}</p>
                     <p>Timezone: {meeting.timezone}</p>
                     <ItemLink href={`/meetings/${meeting.id}`}>View Meeting</ItemLink>
                 </ItemBox>

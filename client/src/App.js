@@ -7,6 +7,7 @@ import SingleCampaignPage from './SingleCampaignPage';
 import CreateMeeting from './CreateMeeting';
 import Header from './Header';
 import Login from './Login';
+import MeetingConfirmation from './MeetingConfirmation';
 
 
 
@@ -22,9 +23,11 @@ function App() {
     <Header /> 
     <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/campaign/:campaignId" element={<SingleCampaignPage />} />
+          <Route path="/meetings/:meetingId" element={<SingleCampaignPage />} />
           <Route path="/" element={<Homepage />} /> 
           <Route path="/createmeeting" element={<CreateMeeting />} />
+          <Route path="/meetingcreated" element={<MeetingConfirmation />} />
+
       </Routes>
     
   </Router>

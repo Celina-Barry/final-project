@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InputField from './InputField';
+import { useNavigate } from 'react-router-dom';
 //import { useUserContext } from './UserContext';
 import moment from 'moment';
 // export const UserContext = React.createContext();
@@ -12,6 +13,7 @@ import moment from 'moment';
 //const UserContext = React.createContext({ loginEmail: "celina.barry@gmail.com" });
 
 const CreateMeeting = () => {
+    const navigate = useNavigate();
     const loginEmail = localStorage.getItem('loginEmail');
     //const { loginEmail } = useContext(useUserContext)
     const [formData, setFormData] = useState({});
@@ -155,28 +157,6 @@ const CreateMeeting = () => {
 "America/Tegucigalpa",
 "Pacific/Apia"
     ];
-    // useEffect(() => {
-    //     fetchAccessToken();
-    // }, []);
-    // const fetchAccessToken = async () => {
-    //     try {
-    //         const tokenUrl = `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=accountId`;
-    //         const response = await fetch(tokenUrl, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Authorization': 'Basic base64(clientId:clientSecret)',
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-
-    //         const tokenData = await response.json();
-    //         setZoomAccessToken(tokenData.access_token);
-    //     } catch (error) {
-    //         console.error('Error fetching Zoom access token:', error);
-    //     }
-    // };
-    
-
 
     const handleChange = (key, value) => {
         setFormData({
@@ -187,7 +167,14 @@ const CreateMeeting = () => {
 
     const handleSubmit = async (e, data) => {
         e.preventDefault();
-
+        const combineDateAndTime = (date, time) => {
+            const combinedDateTime = new Date(`${date}T${time}:00Z`);
+            return combinedDateTime.toISOString();
+          }
+          
+          const formattedStartTime = combineDateAndTime(formData.date, formData.time);
+          console.log(formattedStartTime);
+          
         if (data) {
             try {
                 const response = await fetch(`/newmeeting/${loginEmail}`, {
@@ -199,7 +186,10 @@ const CreateMeeting = () => {
                 });
 
                 const responseData = await response.json();
-                // Handle the response data as needed
+                if (response.status === 201) {
+                    console.log("Meeting Created Response Data: ", responseData)
+                    navigate('/meetingcreated', { state: { meetingDetails: responseData } });
+                }
             } catch (error) {
                 console.error('Error creating meeting:', error);
             }
@@ -282,7 +272,7 @@ const ZoomMeetingIdContainer = styled.div`
 const MeetingForm = styled.form`
     border: 1px solid black;
     border-radius: 5px;
-    padding: 15px, 25px;
+    padding: 15px 25px;
     background-color: lightgray;
 `;
 

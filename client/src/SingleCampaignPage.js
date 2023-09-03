@@ -25,33 +25,40 @@ const ActionContainer = styled.div`
 // Define your styled components
 
 const SingleCampaignPage = () => {
+    const formattedDateTime = moment("2023-08-23T18:30:00Z").format('YYYY-MM-DDTHH:mm');
+    const loginEmail = localStorage.getItem('loginEmail');
     const { meetingId } = useParams();
     const [meetingData, setMeetingData] = useState(null);
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     useEffect(() => {
+        const loginEmail = localStorage.getItem('loginEmail');
+        console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)    
         const fetchMeetingData = async () => {
             try {
-                // Fetch meeting details using the Zoom API
-                const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ZOOM_API_TOKEN',                    },
-                });
-
+                const response = await fetch(`/meetings/${meetingId}/${loginEmail}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch meeting details');
                 }
-
+    
                 const data = await response.json();
                 setMeetingData(data);
             } catch (error) {
                 console.error('Error fetching meeting details:', error);
             }
         };
-
+    
         fetchMeetingData();
     }, [meetingId]);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setMeetingData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+    
 
     const handleUpdate = async (formData) => {
         try {
@@ -101,13 +108,13 @@ const SingleCampaignPage = () => {
         <SingleCampaignContainer>
             <FormContainer>
                 <form onSubmit={(e) => { e.preventDefault(); handleUpdate(meetingData); }}>
-                    {/* Prepopulate input fields with meeting data */}
+                    
                     {meetingData && (
                         <>
-                            <input type="text" name="topic" placeholder="Topic" value={meetingData.topic} />
-                            <input type="text" name="agenda" placeholder="Agenda" value={meetingData.agenda} />
-                            <input type="datetime-local" name="start_time" value={meetingData.start_time} />
-                            <input type="text" name="timezone" placeholder="Timezone" value={meetingData.timezone} />
+                            <input type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
+                            <input type="text" name="agenda" placeholder="Agenda" value={meetingData.agenda} onChange={handleInputChange} />
+                            <input type="datetime-local" name="start_time" value={formattedDateTime} onChange={handleInputChange} />
+                            <input type="text" name="timezone" placeholder="Timezone" value={meetingData.timezone} onChange={handleInputChange} />
 
                             <button type="submit">Update Meeting</button>
                         </>
