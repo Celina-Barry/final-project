@@ -2,88 +2,72 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 const ItemContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 `;
 
 const ItemBox = styled.div`
-  border: 1px solid #ddd;
-  padding: 20px;
-  width: 250px;
-  text-align: center;
-`;
-
-const ItemImage = styled.img`
-  max-width: 100%;
-  height: auto;
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 250px;
+    text-align: center;
 `;
 
 const ItemName = styled.p`
-  font-weight: bold;
-  margin-top: 10px;
-`;
-
-const ItemPrice = styled.p`
-  margin-top: 5px;
-  color: #777;
+    font-weight: bold;
+    margin-top: 10px;
 `;
 
 const ItemLink = styled.a`
-  display: inline-block;
-  margin-top: 15px;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 5px;
+    display: inline-block;
+    margin-top: 15px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
 
-  &:hover {
-    background-color: #0056b3;
-  }
+    &:hover {
+        background-color: #0056b3;
+    }
 `;
 
-const Campaigns = ({ category, currentPage }) => {
-  const [items, setItems] = useState([]);
+const Campaigns = () => {
+    const loginEmail = localStorage.getItem('loginEmail');
+    const [meetings, setMeetings] = useState([]);
 
-  useEffect(() => {
-      const fetchItems = async () => {
- 
-        try {
-          let url = '/items';
-          if (category && currentPage) {
-            url += `?page=${currentPage}&category=${category}`;
-          }
-          else if (category) {
-            url += `?category=${category}`
-          }
-          else if (currentPage) {
-            url += `?page=${currentPage}`;
-          }
-          console.log("items url fetch: ", url)
-          const response = await fetch(url);
-          const data = await response.json();
-          setItems(data.data.items);
-        } catch (error) {
-          console.error('Error fetching items:', error);
-        }
-      };
-  
-      fetchItems();
-    }, [category, currentPage]);  
+    useEffect(() => {
+        const fetchMeetings = async () => {
+            try {
+                // Fetch meetings data from Zoom API
+                const response = await fetch(`/meetings/${loginEmail}`);
+                const data = await response.json();
+                if(!data.meetings) {
+                    console.error('No meetings data from Zoom API');
+                    return;
+                }
+                setMeetings(data.meetings);
+            } catch (error) {
+                console.error('Error fetching meetings:', error);
+            }
+        };
+
+        fetchMeetings();
+    }, []);
 
     return (
         <ItemContainer>
-        {items.map(item => (
-            <ItemBox key={item._id}>
-            <ItemImage src={item.imageSrc} alt={item.name} />
-            <ItemName>{item.name}</ItemName>
-            <ItemPrice>Price: {item.price}</ItemPrice>
-        <ItemLink href={`/items/${item._id}`}>View Item</ItemLink>
-    </ItemBox>
-    ))}
-    </ItemContainer>
-  );
+            {meetings.map(meeting => (
+                <ItemBox key={meeting.id}>
+                    <ItemName>{meeting.topic}</ItemName>
+                    <p>Date: {meeting.start_time}</p>
+                    <p>Timezone: {meeting.timezone}</p>
+                    <ItemLink href={`/meetings/${meeting.id}`}>View Meeting</ItemLink>
+                </ItemBox>
+            ))}
+        </ItemContainer>
+    );
 };
 
 export default Campaigns;

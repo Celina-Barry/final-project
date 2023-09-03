@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-const InputField = ({ type, name, placeholder, required, handlechange }) => {
+const InputField = ({ type, name, placeholder, required, handleChange }) => {
 
     return (
         <StyledInput
             type={type}
             placeholder={placeholder}
             required={required}
-            onChange={(e) => handlechange(name, e.target.value)}
+            onChange={(e) => handleChange(name, e.target.value)}
         />
     );
 };

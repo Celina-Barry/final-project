@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 //import ReactDOM from 'react-dom';
+import { UserProvider } from './UserContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Homepage from './Homepage';
 import SingleCampaignPage from './SingleCampaignPage';
@@ -15,7 +16,7 @@ function App() {
 
 
   return (
-    
+    <UserProvider>
   <Router>
     
     <Header /> 
@@ -27,6 +28,7 @@ function App() {
       </Routes>
     
   </Router>
+  </UserProvider>
     );
   }
 export default App;

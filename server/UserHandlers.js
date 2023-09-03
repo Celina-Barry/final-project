@@ -11,9 +11,128 @@ const options = {
     useUnifiedTopology: true,
 };
 
+const getMeetings = async (req, res) => {
+    console.log("get Meetings function called");
+    
+    const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
+    console.log("MONGO_URI: ", MONGO_URI);
+    
+    const { email } = req.params;
+   
+    console.log("Email parameter:", email);
+;
+    
+    const client = new MongoClient(MONGO_URI, options);
+    
+    try {
+        await client.connect();
+        const db = client.db('final-project');
+        
+        // Retrieve user's data from MongoDB
+        const user = await db.collection('users').findOne({ "email": email });
+        console.log("user: ", user)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { zoom_user_id, zoom_token } = user;
+
+        const zoomApiUrl = `https://api.zoom.us/v2/users/${zoom_user_id}/meetings`;
+        const zoomApiHeaders = {
+            'Authorization': `Bearer ${zoom_token}`,
+            'Content-Type': 'application/json',
+        };
+
+        const response = await axios.get(zoomApiUrl, {
+            headers: zoomApiHeaders,
+        });
+
+        const zoomData = response.data;
+        return res.status(201).json(zoomData);
+    } catch (error) {
+        console.error('Error getting Zoom meetings:', error);
+        return res.status(500).json({ message: 'Error getting Zoom meeting' });
+    } finally {
+        client.close();
+    }
+};
+
+
+const createMeeting = async (req, res) => {
+    console.log("Meeting function called");
+    
+    const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
+    console.log("MONGO_URI: ", MONGO_URI);
+    
+    const { email } = req.params;
+    const { topic, agenda, start_time, timezone } = req.body;
+    console.log("Email parameter:", email);
+    console.log("form body", req.body);
+    
+    const client = new MongoClient(MONGO_URI, options);
+    
+    try {
+        await client.connect();
+        const db = client.db('final-project');
+        
+        // Retrieve user's data from MongoDB
+        const user = await db.collection('users').findOne({ "email": email });
+        console.log("user: ", user)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { zoom_user_id, zoom_token } = user;
+
+        const zoomApiUrl = `https://api.zoom.us/v2/users/${zoom_user_id}/meetings`;
+        const zoomApiHeaders = {
+            'Authorization': `Bearer ${zoom_token}`,
+            'Content-Type': 'application/json',
+        };
+        const zoomMeetingData = {
+            topic,
+            agenda,
+            start_time,
+            timezone,
+            type: 2,
+            settings: {  
+                allow_multiple_devices: true,
+                alternative_hosts_email_notification: true,
+                auto_recording: "cloud",
+                calendar_type: 1,
+                close_registration: false,
+                email_notification: true,
+                encryption_type: "enhanced_encryption",
+                focus_mode: true,
+                host_video: true,
+                jbh_time: 0,
+                join_before_host: false,      
+                mute_upon_entry: false,
+                participant_video: false,
+                registrants_confirmation_email: true,
+                registrants_email_notification: true,
+                registration_type: 1,
+                show_share_button: true,
+                waiting_room: false,
+                watermark: false
+            }
+        };
+
+        const response = await axios.post(zoomApiUrl, zoomMeetingData, {
+            headers: zoomApiHeaders,
+        });
+
+        const zoomData = response.data;
+        return res.status(201).json(zoomData);
+    } catch (error) {
+        console.error('Error creating Zoom meeting:', error);
+        return res.status(500).json({ message: 'Error creating Zoom meeting' });
+    } finally {
+        client.close();
+    }
+};
+
 
 const getUserByEmail = async (req, res) => {
-    console.log("Handler function called");
+    console.log("get user by email Handler function called");
     const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority"
     console.log("MONGO_URI: ", MONGO_URI)
     const client = new MongoClient(MONGO_URI, options);
@@ -148,5 +267,7 @@ const createUser = async (req, res) => {
 module.exports = {
     getUserByEmail,
     createUser,
-    updateUser
+    updateUser,
+    createMeeting,
+    getMeetings
 };

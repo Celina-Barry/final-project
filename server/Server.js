@@ -1,5 +1,5 @@
 'use strict';
-const { getUserByEmail, createUser, updateUser } = require('./UserHandlers');
+const { getUserByEmail, createUser, updateUser, createMeeting, getMeetings } = require('./UserHandlers');
 const express = require('express');
 const morgan = require('morgan');
 
@@ -26,8 +26,9 @@ const app = express()
 
   // REST endpoints?
   //meeting endpoints
-  //.get('/meetings', getMeetings)
+  .get('/meetings/:email', getMeetings)
   //.get('/meetings/:id', getMeetingsById)
+  .post('/newmeeting/:email', createMeeting)
   
   //user endpoints
   .post('/newuser', createUser)

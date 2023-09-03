@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useUserContext } from './UserContext';
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
 const FormContainer = styled.div`
@@ -51,6 +52,8 @@ const Login = () => {
     const [error, setError] = useState('');
     const [encodedEmail, setEncodedEmail] = useState('');
 
+    const { loginEmail, updateLoginEmail } = useUserContext();
+
     useEffect(() => {
       // Encode the email whenever the 'email' state changes
       const encoded = encodeURIComponent(email);
@@ -80,6 +83,9 @@ const Login = () => {
       
           if (data) {
             console.log(data.data);
+            updateLoginEmail(data.data.email);
+            localStorage.setItem('loginEmail', data.data.email);
+
             navigate("/");
             // Redirect to homepage, save userid to local storage
           }
