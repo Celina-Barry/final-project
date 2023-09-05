@@ -5,6 +5,8 @@ const ItemContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    padding: 70px;
+    
 `;
 
 const ItemBox = styled.div`
@@ -12,21 +14,29 @@ const ItemBox = styled.div`
     padding: 20px;
     width: 250px;
     text-align: center;
+    box-shadow: var(--box-shadow);
 `;
 
 const ItemName = styled.p`
     font-weight: bold;
     margin-top: 10px;
+    color: var(--secondary-color);
+    font-weight: 500;
+    margin-bottom: 1rem;
+
 `;
 
 const ItemLink = styled.a`
     display: inline-block;
     margin-top: 15px;
     padding: 5px 10px;
-    background-color: #007bff;
+    background-color: var(--rose-red);
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    font-family: var(--font-family);
 
     &:hover {
         background-color: #0056b3;

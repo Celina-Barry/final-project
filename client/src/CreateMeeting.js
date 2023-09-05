@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import InputField from '../InputField';
-import TextArea from '../TextArea';
+import InputField from './InputField';
+import TextArea from './TextArea';
 import { useNavigate } from 'react-router-dom';
-import { TIMEZONES } from '../timezones';
+import { TIMEZONES } from './ZoomTimezones';
 
 //import { useUserContext } from './UserContext';
 import moment from 'moment';
@@ -41,7 +41,7 @@ const CreateMeeting = () => {
             data.start_time = formattedStartTime
             console.log("formatted start time inside handle submit: ", formattedStartTime);
             console.log("meeting agenda: ", data.agenda)
-               
+
         if (data) {
             try {
                 const response = await fetch(`/newmeeting/${loginEmail}`, {
@@ -66,7 +66,9 @@ const CreateMeeting = () => {
 
     return (
         <Wrapper>
-            <InputContainer>
+            <FormContainer>
+            <FormHeading>Use the form below to create a meeting </FormHeading>
+
             <MeetingForm onSubmit={(event) => handleSubmit(event, formData)}>
 
                 <InputField
@@ -76,7 +78,7 @@ const CreateMeeting = () => {
                     required={true}
                     handleChange={handleChange}
                 />
-                 <TextArea
+                <TextArea
                     type="textarea"
                     name="agenda"
                     placeholder="Meeting Agenda"
@@ -104,9 +106,10 @@ const CreateMeeting = () => {
                         </select>
                     </label>
                 <SubmitButton type="submit">Create Meeting</SubmitButton>
-            </MeetingForm>
-            </InputContainer>
+          
             
+            </MeetingForm>   
+            </FormContainer>  
             {zoomAccessToken && (
                 <ZoomAccessTokenContainer>
                     <p>Zoom Access Token: {zoomAccessToken}</p>
@@ -122,74 +125,79 @@ const CreateMeeting = () => {
         </Wrapper>
     );
 };
+const FormContainer = styled.div`
+    flex: 1;
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: 5px;
+    max-width: 400px;
+    `;
 
 
 const ZoomAccessTokenContainer = styled.div`
-    
-`;
-
-const ZoomMeetingIdContainer = styled.div`
-
-`;
-
-
-
-const StyledTextArea = styled.textarea`
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--background-color);
+    border-radius: 5px;
     width: 100%;
-    height: 150px;
-    resize: none;
 `;
+
+const ZoomMeetingIdContainer = styled(ZoomAccessTokenContainer)``;
 
 const MeetingForm = styled.form`
-    border: 1px solid black;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    padding: 15px 25px;
-    background-color: lightgray;
+    
+    background-color: var(--background-color);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    width: 100%;
 `;
-
-const InputContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin: 15px 25px;
-    padding: 5px;
-`;
+const FormHeading = styled.h2`
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+    `;
+// const InputContainer = styled.div`
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     width: 100%;
+//     padding: 5px;
+// `;
 
 const SubmitButton = styled.button`
-    color: black;
-    background-color: white;
-    padding: 5px 25px;
-    border: 1px solid darkgray;
+    color: var(--font-color);
+    background-color: var(--secondary-color);
+    padding: 10px 30px;
+    border: none;
     border-radius: 5px;
-    transition: all 250ms ease;
+    transition: var(--transition);
 
     &:hover {
-        color: white;
-        background-color: darkgray;
+        background-color: var(--hover-color);
         cursor: pointer;
     }
 
     &:disabled {
-        color: lightgray;
+        color: var(--disabled-color);
+        background-color: var(--background-color);
     }
 
     &:disabled:hover {
-        background-color: white;
+        background-color: var(--background-color);
     }
 `;
+
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-right: 20px;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 60px);
+    padding: 30px;
 `;
-
-
-const ItemDetails = styled.div`
-    margin-left: 20px;
-`;
-
 
 export default CreateMeeting;

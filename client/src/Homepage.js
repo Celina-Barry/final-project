@@ -6,8 +6,6 @@ import Campaigns from './Campaigns';
 const StyledHome = styled.div`
     height: 100vh;  
     width: 100vw;
-    background-image: url("https://imagedelivery.net/9sCnq8t6WEGNay0RAQNdvQ/UUID-cl9aapb372366usoobi9dksk2/public");
-    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
 `

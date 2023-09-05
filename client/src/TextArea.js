@@ -13,7 +13,7 @@ const TextArea = ({ type, name, placeholder, required, handleChange }) => {
 };
 
 const StyledTextArea = styled.textarea`
-    width: 100%;
+    width: 90%;
     height: 150px;
     resize: none;
 

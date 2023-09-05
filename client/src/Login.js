@@ -1,28 +1,58 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useUserContext } from './UserContext';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styled from "styled-components"
-const FormContainer = styled.div`
+const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    background-color: rgba(255, 255, 255, 0.5);
-    padding: 40px;
+    justify-content: center;
+    height: 70vh;
+    padding: 20px;
+`;
 
+const FormContainer = styled.div`
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-bottom: 20px;
 `;
+
+const Form = styled.form`
+    display: flex;
+    flex-direction: column;
+`;
+
 const Input = styled.input`
-    width: 90%;
+    margin-bottom: 15px;
     padding: 10px;
-    border: 0.5px solid black;
-    border-radius: 4px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 `;
+
+const SubmitButton = styled.button`
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+    
+    &:hover {
+        background-color: #0056b3;
+    }
+`;
+
 const LoginButton = styled.button`
-    background-color: blue;
+    background-color: var(--primary-color);
+    justify-content: center;
     font-family: sans-serif;
     color: white;
     border-style: none;
-    width: 100%;
+    width: 95%;
     padding: 8px;
     border-radius: 4px;
     cursor: pointer;
@@ -44,7 +74,14 @@ const StyledSignIn = styled.div`
   background-repeat: no-repeat;
 
 `;
-
+const SignUpText = styled.p`
+    text-align: center;
+    margin-top: 20px;
+`;
+const Header = styled.h2`
+    text-align: center;
+    margin-bottom: 20px;
+`;
 const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -52,7 +89,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [encodedEmail, setEncodedEmail] = useState('');
 
-    const { loginEmail, updateLoginEmail } = useUserContext();
+    //const { loginEmail, updateLoginEmail } = useUserContext();
 
     useEffect(() => {
       // Encode the email whenever the 'email' state changes
@@ -72,22 +109,29 @@ const Login = () => {
               "Content-Type": "application/json",
             },
           });
+          const data = await response.json();
+          console.log("Data from server:", data.data);
       
           if (!response.ok) {
             console.log("Client response: ", response)
-            throw new Error("Server error");
+            
+            //throw new Error("Server error");
+            if (data.status === 404 && data.message === 'user not found') {
+              window.alert("User not found, please sign up to use this app");
+              return;
           }
-      
-          const data = await response.json();
-          console.log("Data from server:", data.data.id);
-      
-          if (data) {
+
+          throw new Error(data.message || "Server error");
+      }
+        
+      console.log("Data from server:", data.data.id);
+          
+      if (data) {
             console.log(data.data);
-            updateLoginEmail(data.data.email);
+            //updateLoginEmail(data.data.email);
             localStorage.setItem('loginEmail', data.data.email);
 
             navigate("/");
-            // Redirect to homepage, save userid to local storage
           }
         } catch (error) {
           console.error(error);
@@ -100,16 +144,20 @@ const Login = () => {
             <SignInWrapper>
             
             <FormContainer>
-        <form onSubmit={handleSubmit}>
+            <Header>Login</Header> 
+            
+              <Form onSubmit={handleSubmit}>
            
             <Input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your email"/>
             <Input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="your password"/>
-            <LoginButton type="submit">Submit</LoginButton>
-        </form>
+            <SubmitButton type="submit">Submit</SubmitButton>
+            </Form>
+            <SignUpText>
+            New user? <Link to="/signupnewuser">Sign up here</Link>
+          </SignUpText>
         </FormContainer> 
-
-        </SignInWrapper>
-        </StyledSignIn>
+      </SignInWrapper>
+      </StyledSignIn>
     )
 }
 export default Login;

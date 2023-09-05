@@ -11,6 +11,118 @@ const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
+const getMeetingInvitation = async (req, res) => {
+    console.log("get meeting invitation function called")
+
+    const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
+    console.log("MONGO_URI: ", MONGO_URI);
+    const { id } = req.params;
+    const { email } = req.params;
+   
+    console.log("Email parameter:", email);
+    
+    const client = new MongoClient(MONGO_URI, options);
+    
+    try {
+        await client.connect();
+        const db = client.db('final-project');
+        
+        // Retrieve user's data from MongoDB
+        const user = await db.collection('users').findOne({ "email": email });
+        console.log("user: ", user)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { zoom_user_id, zoom_token, token_expiry } = user;
+        const currentTime = Math.floor(Date.now() / 1000);
+        console.log("current time: ", currentTime, "token_expiry: ", token_expiry)
+        if (currentTime >= token_expiry) {
+            const refreshedUser = await refreshTokenForUser(email);
+            if (refreshedUser.status !== 200) {
+                return res.status(500).json({ message: 'Error refreshing Zoom token' });
+            }
+            zoom_token = refreshedUser.data.zoom_token;
+            console.log("refreshed zoom token: ", zoom_token)
+            console.log('Token to be used for Zoom API call:', zoom_token);
+        }
+        const zoomApiUrl = `https://api.zoom.us/v2/meetings/${id}/invitation`;
+        const zoomApiHeaders = {
+            'Authorization': `Bearer ${zoom_token}`,
+            'Content-Type': 'application/json',
+        };
+
+        const response = await axios.get(zoomApiUrl, {
+            headers: zoomApiHeaders,
+        });
+
+        const zoomData = response.data;
+        console.log("meeting invitation data: ", zoomData)
+        return res.status(200).json(zoomData);
+        
+    } catch (error) {
+        console.error('Error getting Zoom meeting invitation:', error);
+        return res.status(500).json({ message: 'Error getting Zoom meeting invitation' });
+    } finally {
+        client.close();
+    }
+};
+
+
+const deleteMeeting = async (req, res) => {
+    console.log("delete meeting function called")
+
+    const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
+    console.log("MONGO_URI: ", MONGO_URI);
+    const { id } = req.params;
+    const { email } = req.params;
+   
+    console.log("Email parameter:", email);
+    
+    const client = new MongoClient(MONGO_URI, options);
+    
+    try {
+        await client.connect();
+        const db = client.db('final-project');
+        
+        // Retrieve user's data from MongoDB
+        const user = await db.collection('users').findOne({ "email": email });
+        console.log("user: ", user)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { zoom_user_id, zoom_token, token_expiry } = user;
+        const currentTime = Math.floor(Date.now() / 1000);
+        console.log("current time: ", currentTime, "token_expiry: ", token_expiry)
+        if (currentTime >= token_expiry) {
+            const refreshedUser = await refreshTokenForUser(email);
+            if (refreshedUser.status !== 200) {
+                return res.status(500).json({ message: 'Error refreshing Zoom token' });
+            }
+            zoom_token = refreshedUser.data.zoom_token;
+            console.log("refreshed zoom token: ", zoom_token)
+            console.log('Token to be used for Zoom API call:', zoom_token);
+        }
+        const zoomApiUrl = `https://api.zoom.us/v2/meetings/${id}`;
+        const zoomApiHeaders = {
+            'Authorization': `Bearer ${zoom_token}`,
+            'Content-Type': 'application/json',
+        };
+
+        const response = await axios.delete(zoomApiUrl, {
+            headers: zoomApiHeaders,
+        });
+
+        const zoomData = response.data;
+        console.log("deleted meeting data: ", zoomData)
+        return res.status(200).json(zoomData);
+        
+    } catch (error) {
+        console.error('Error deleting Zoom meetings:', error);
+        return res.status(500).json({ message: 'Error deleting Zoom meeting' });
+    } finally {
+        client.close();
+    }
+};
 const updateMeeting = async (req, res) => {
     console.log("Update Meeting function called");
     
@@ -24,15 +136,6 @@ const updateMeeting = async (req, res) => {
     console.log("form body", req.body);
     
     const client = new MongoClient(MONGO_URI, options);
-
-    // const combineDateAndTime = (dateStr, timeStr) => {
-    //     const combinedDateTime = new Date(`${dateStr}T${timeStr}:00Z`);
-    //     return combinedDateTime.toISOString();
-    //   }
-      
-    //   const formattedStartTime = combineDateAndTime(formData.date, formData.time);
-    //   console.log(formattedStartTime);  // "2023-09-13T18:30:00.000Z"
-      
     
     try {
         await client.connect();
@@ -172,7 +275,7 @@ const getMeetingsById = async (req, res) => {
         
         // Retrieve user's data from MongoDB
         const user = await db.collection('users').findOne({ "email": email });
-        console.log("user: ", user)
+        //console.log("user: ", user)
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -185,8 +288,8 @@ const getMeetingsById = async (req, res) => {
                 return res.status(500).json({ message: 'Error refreshing Zoom token' });
             }
             zoom_token = refreshedUser.data.zoom_token;
-            console.log("refreshed zoom token: ", zoom_token)
-            console.log('Token to be used for Zoom API call:', zoom_token);
+            //console.log("refreshed zoom token: ", zoom_token)
+            //console.log('Token to be used for Zoom API call:', zoom_token);
         }
         const zoomApiUrl = `https://api.zoom.us/v2/meetings/${id}`;
         const zoomApiHeaders = {
@@ -199,7 +302,7 @@ const getMeetingsById = async (req, res) => {
         });
 
         const zoomData = response.data;
-        console.log("Single meeting data: ", zoomData)
+        //console.log("Single meeting data: ", zoomData)
         if (zoomData.start_time) {
             zoomData.start_time = moment(zoomData.start_time).format('YYYY-MM-DDTHH:mm');
             console.log("start_time: ", zoomData.start_time)
@@ -421,7 +524,7 @@ const getToken = async (zoom_account_id, client_id, client_secret) => {
         console.log("Token Request Response:", request.data);
         const { access_token, expires_in } = request.data;
         const tokenExpiryTimestamp = currentTimestamp + expires_in;
-        
+        console.log("TokenExpiryTimestamp from get token: ", tokenExpiryTimestamp)
         return { access_token, expires_in, tokenExpiryTimestamp, error: null };
     } catch (error) {
         console.error("Error fetching token:", error);
@@ -430,6 +533,9 @@ const getToken = async (zoom_account_id, client_id, client_secret) => {
     }
 };
 const createUser = async (req, res) => {
+    console.log("Create new user function called ")
+    const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority"
+
     console.log("MONGO_URI:", MONGO_URI);
     const client = new MongoClient(MONGO_URI, options);  
       
@@ -437,8 +543,39 @@ const createUser = async (req, res) => {
         await client.connect();
   
       const db = client.db("final-project");
+      console.log("New user handler req.body: ", req.body)
+      const { access_token, expires_in, tokenExpiryTimestamp, error } = await getToken(req.body.zoom_account_id, req.body.client_id, req.body.client_secret);
+      if (!access_token) {
+        return res.status(400).json({
+            status: 400,
+            message: "Error connecting your zoom account, please check your credentials, activate your zoom app, and try again."
 
-      await db.collection("users").insertOne(req.body);
+        });
+      }
+      const zoomUserResponse = await axios.get(`https://api.zoom.us/v2/users/${req.body.email}`, {
+        headers: {
+            Authorization: `Bearer ${access_token}`
+        }
+      });
+      const zoomUserData = zoomUserResponse.data;
+      if (!zoomUserData) {
+        return res.status(400).json({
+            status: 400,
+            message: "Error connecting your zoom user info, please check your credentials, activate your zoom app, and try again."
+        });
+    }
+    const userDataToStore = {
+        email: req.body.email,
+        pw: req.body.pw,
+        client_secret: req.body.client_secret,
+        zoom_account_id: req.body.zoom_account_id,
+        zoom_user_id: zoomUserData.id,
+        zoom_token: access_token,
+        client_id: req.body.client_id,
+        token_expiry: tokenExpiryTimestamp
+    };
+
+      await db.collection("users").insertOne(userDataToStore);
       return res.status(201).json({ status: 201, data: req.body });
         
       } catch (err) {
@@ -465,7 +602,7 @@ const createUser = async (req, res) => {
             updateObject.account_id = accountId;
         }
         if (clientId) {
-            updateObject.client_Id = clientId;
+            updateObject.client_id = clientId;
         }
         if (clientSecret) {
             updateObject.client_secret = clientSecret;
@@ -551,5 +688,7 @@ module.exports = {
     getMeetings,
     getMeetingsById,
     refreshTokenForUser,
-    getPastMeeting
+    getPastMeeting,
+    deleteMeeting,
+    getMeetingInvitation
 };
