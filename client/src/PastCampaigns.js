@@ -81,7 +81,7 @@ const PastCampaigns = () => {
                     <p>Date: {formatDate(meeting.start_time)}</p>
                     <p>Time: {formatTime(meeting.start_time)}</p>
                     <p>Timezone: {meeting.timezone}</p>
-                    <ItemLink href={`/pastmeetings/${meeting.id}`}>See Meeting Details</ItemLink>
+                    <ItemLink href={`/pastmeeting/${meeting.id}`}>See Meeting Details</ItemLink>
                 </ItemBox>
             ))}
         </ItemContainer>
