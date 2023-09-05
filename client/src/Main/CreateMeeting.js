@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import InputField from './InputField';
-import TextArea from './TextArea';
+import InputField from '../InputField';
+import TextArea from '../TextArea';
 import { useNavigate } from 'react-router-dom';
-import { TIMEZONES } from './timezones';
+import { TIMEZONES } from '../timezones';
 
 //import { useUserContext } from './UserContext';
 import moment from 'moment';

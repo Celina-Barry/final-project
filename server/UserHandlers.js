@@ -96,7 +96,7 @@ const updateMeeting = async (req, res) => {
     }
 };
 const getPastMeeting = async (req, res) => {
-    console.log("get meeting by id function called")
+    console.log("get past meeting by id function called")
 
     const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
     console.log("MONGO_URI: ", MONGO_URI);
@@ -129,7 +129,7 @@ const getPastMeeting = async (req, res) => {
             console.log("refreshed zoom token: ", zoom_token)
             console.log('Token to be used for Zoom API call:', zoom_token);
         }
-        const zoomApiUrl = `https://api.zoom.us/v2/past_meetings/${id}`;
+        const zoomApiUrl = `https://api.zoom.us/v2/meetings/${id}`;
         const zoomApiHeaders = {
             'Authorization': `Bearer ${zoom_token}`,
             'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ const getPastMeeting = async (req, res) => {
         });
 
         const zoomData = response.data;
-        console.log("Single meeting data: ", zoomData)
+        console.log("Single past meeting data: ", zoomData)
         if (zoomData.start_time) {
             zoomData.start_time = moment(zoomData.start_time).format('YYYY-MM-DDTHH:mm');
             console.log("start_time: ", zoomData.start_time)

@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 //import ReactDOM from 'react-dom';
 import { UserProvider } from './UserContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Homepage from './Homepage';
-import SingleCampaignPage from './SingleCampaignPage';
-import CreateMeeting from './CreateMeeting';
+import Homepage from './Main/Homepage';
+import SingleCampaignPage from './Main/SingleCampaignPage';
+import CreateMeeting from './Main/CreateMeeting';
 import Header from './Header';
-import Login from './Login';
-import MeetingConfirmation from './MeetingConfirmation';
+import Login from './LoginComponents/Login';
+import MeetingConfirmation from './Main/MeetingConfirmation';
 import UpdateCredentialsForm from './UpdateCredentials';
-import PastMeetingsPage from './PastMeetingsPage';
+import PastMeetingsPage from './PastMeetingComponents/PastMeetingsPage';
+import SinglePastMeeting from './PastMeetingComponents/SinglePastMeeting';
 
 
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/meetings/:meetingId" element={<SingleCampaignPage />} />
           <Route path="/" element={<Homepage />} /> 
           <Route path="/pastmeetings" element={<PastMeetingsPage />} /> 
+          <Route path="/pastmeetings/:meetingId" element={<SinglePastMeeting />} /> 
           <Route path="/createmeeting" element={<CreateMeeting />} />
           <Route path="/meetingcreated" element={<MeetingConfirmation />} />
           <Route path="/updatecredentials" element={<UpdateCredentialsForm />} />

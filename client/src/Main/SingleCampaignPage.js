@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import { TIMEZONES } from './timezones';
+import { TIMEZONES } from '../timezones';
 
 
 const SingleCampaignContainer = styled.div`
@@ -89,13 +89,14 @@ const SingleCampaignPage = () => {
         e.preventDefault();
         const loginEmail = localStorage.getItem('loginEmail');
         console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)
-        const combineDateAndTime = (date, time) => {
-            const combinedDateTime = new Date(`${date}T${time}:00Z`);
-            return combinedDateTime.toISOString();
-        }
-            // const formattedStartTime = combineDateAndTime(meetingData.date, meetingData.time);
-            // meetingData.start_time = formattedStartTime
-            console.log("befor submit meetingData.start_time: ", meetingData.start_time);     
+        // //const startTime = meetingData.start_time;
+        // const combineDateAndTime = (startTime) => {
+        //     const combinedDateTime = new Date(`${startTime}:00Z`);
+        //     return combinedDateTime.toISOString();
+        // }
+        //     const formattedStartTime = combineDateAndTime(meetingData.start_time);
+            meetingData.start_time = `${meetingData.start_time}:00`
+            console.log("before submit meetingData.start_time: ", meetingData.start_time);     
         if (meetingData) {
             try {
                 const response = await fetch(`/meetings/${meetingId}/${loginEmail}`, {
@@ -119,24 +120,29 @@ const SingleCampaignPage = () => {
         };
     }
     const handleDelete = async () => {
-        try {
-            const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ZOOM_API_TOKEN',
-                },
-            });
+        const loginEmail = localStorage.getItem('loginEmail');
+        console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)
+            try {
+                const response = await fetch(`/meetings/${meetingId}/${loginEmail}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                    
+                });
 
-            if (!response.ok) {
-                throw new Error('Failed to delete meeting');
+                const responseData = await response.text();
+                if (response.text) {
+                    //console.log("Meeting updated Response Data: ", responseData)
+                    window.alert("Meeting successfully deleted");
+                } else {
+                    console.error("Error from server: ", responseData)
+                }
+            } catch (error) {
+                console.error('Error deleting meeting:', error);
             }
-
-            // Redirect here for delete
-        } catch (error) {
-            console.error('Error deleting meeting:', error);
-        }
-    };
-
+        };
+    
     let formattedDateTime;
     if (meetingData && meetingData.start_time) {
         formattedDateTime = moment(meetingData.start_time).format('YYYY-MM-DDTHH:mm');
