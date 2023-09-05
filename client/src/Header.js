@@ -7,7 +7,7 @@ const HeaderContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background-color: hotpink;
+  background-color: blue;
   color: #fff;
 `;
 
@@ -26,9 +26,11 @@ const Header = () => {
     <HeaderContainer>
       <CategoryLinks>
       <Link to="/">Home</Link>
+      
       </CategoryLinks>
       <StyledLink to="/createmeeting">Create Meeting</StyledLink>
-      <StyledLink to="/usercredentials">Update Credntials</StyledLink>
+      <StyledLink to="/pastmeetings">View Past Meetings</StyledLink>
+      <StyledLink to="/updatecredentials">Update Credentials</StyledLink>
     </HeaderContainer>
   );
 };

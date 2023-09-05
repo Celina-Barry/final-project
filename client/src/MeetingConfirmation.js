@@ -31,7 +31,7 @@ const MeetingConfirmation = () => {
                     <DetailLabel>Time:</DetailLabel>
                     <DetailValue>{formatTime(meetingDetails.start_time)}</DetailValue>
                     <DetailLabel>Timezone:</DetailLabel>
-                    <DetailValue>{formatTime(meetingDetails.timezone)}</DetailValue>
+                    <DetailValue>{meetingDetails.timezone}</DetailValue>
                 </DetailItem>
             </MeetingDetails>
                 <ButtonsContainer>

@@ -8,6 +8,8 @@ import CreateMeeting from './CreateMeeting';
 import Header from './Header';
 import Login from './Login';
 import MeetingConfirmation from './MeetingConfirmation';
+import UpdateCredentialsForm from './UpdateCredentials';
+import PastMeetingsPage from './PastMeetingsPage';
 
 
 
@@ -25,8 +27,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/meetings/:meetingId" element={<SingleCampaignPage />} />
           <Route path="/" element={<Homepage />} /> 
+          <Route path="/pastmeetings" element={<PastMeetingsPage />} /> 
           <Route path="/createmeeting" element={<CreateMeeting />} />
           <Route path="/meetingcreated" element={<MeetingConfirmation />} />
+          <Route path="/updatecredentials" element={<UpdateCredentialsForm />} />
 
       </Routes>
     

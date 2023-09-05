@@ -44,7 +44,7 @@ const formatTime = (isoString) => {
     return date.toLocaleTimeString(undefined, options);
 };
 
-const Campaigns = () => {
+const PastCampaigns = () => {
     const loginEmail = localStorage.getItem('loginEmail');
     const [meetings, setMeetings] = useState([]);
 
@@ -58,13 +58,13 @@ const Campaigns = () => {
                     console.error('No meetings data from Zoom API');
                     return;
                 }
-                const upcomingMeetings = data.meetings.filter(meeting => {
+                const PastMeetings = data.meetings.filter(meeting => {
                     const meetingDate = new Date(meeting.start_time);
                     const now = new Date();
-                    return meetingDate > now;
+                    return meetingDate < now;
                 });
 
-                setMeetings(upcomingMeetings);
+                setMeetings(PastMeetings);
             } catch (error) {
                 console.error('Error fetching meetings:', error);
             }
@@ -81,11 +81,11 @@ const Campaigns = () => {
                     <p>Date: {formatDate(meeting.start_time)}</p>
                     <p>Time: {formatTime(meeting.start_time)}</p>
                     <p>Timezone: {meeting.timezone}</p>
-                    <ItemLink href={`/meetings/${meeting.id}`}>View Meeting</ItemLink>
+                    <ItemLink href={`/pastmeetings/${meeting.id}`}>See Meeting Details</ItemLink>
                 </ItemBox>
             ))}
         </ItemContainer>
     );
 };
 
-export default Campaigns;
+export default PastCampaigns;

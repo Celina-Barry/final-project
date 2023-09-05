@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import moment from 'moment';
+
+import { TIMEZONES } from './timezones';
+
 
 const SingleCampaignContainer = styled.div`
     display: flex;
@@ -21,19 +24,40 @@ const ActionContainer = styled.div`
     flex-direction: column;
     align-items: flex-start;
 `;
+const StyledForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+`;
+
+const Textarea = styled.textarea`
+    width: 100%;
+    height: 150px;
+    resize: none;
+`;
+
+const ActionButton = styled.button`
+    margin: 15px 0;
+`;
 
 // Define your styled components
 
 const SingleCampaignPage = () => {
-    const formattedDateTime = moment("2023-08-23T18:30:00Z").format('YYYY-MM-DDTHH:mm');
+    const navigate = useNavigate();
+    //const formattedDateTime = moment("2023-08-23T18:30:00Z").format('YYYY-MM-DDTHH:mm');
     const loginEmail = localStorage.getItem('loginEmail');
     const { meetingId } = useParams();
-    const [meetingData, setMeetingData] = useState(null);
+    const [meetingData, setMeetingData] = useState({
+        topic: '',
+        agenda: '',
+        start_time: '',
+        timezone: '',
+    });
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
 
     useEffect(() => {
-        const loginEmail = localStorage.getItem('loginEmail');
+        //const loginEmail = localStorage.getItem('loginEmail');
         console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)    
         const fetchMeetingData = async () => {
             try {
@@ -42,8 +66,9 @@ const SingleCampaignPage = () => {
                     throw new Error('Failed to fetch meeting details');
                 }
     
-                const data = await response.json();
-                setMeetingData(data);
+                const meetingData = await response.json();
+                setMeetingData(meetingData);
+                console.log("meetingData: ", meetingData)
             } catch (error) {
                 console.error('Error fetching meeting details:', error);
             }
@@ -60,31 +85,39 @@ const SingleCampaignPage = () => {
     };
     
 
-    const handleUpdate = async (formData) => {
-        try {
-
-            formData.start_time = moment(formData.start_time).toISOString();
-
-            const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': 'Bearer YOUR_ZOOM_API_TOKEN', 
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update meeting');
-            }
-
-            const updatedData = await response.json();
-            setMeetingData(updatedData);
-        } catch (error) {
-            console.error('Error updating meeting:', error);
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        const loginEmail = localStorage.getItem('loginEmail');
+        console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)
+        const combineDateAndTime = (date, time) => {
+            const combinedDateTime = new Date(`${date}T${time}:00Z`);
+            return combinedDateTime.toISOString();
         }
-    };
+            // const formattedStartTime = combineDateAndTime(meetingData.date, meetingData.time);
+            // meetingData.start_time = formattedStartTime
+            console.log("befor submit meetingData.start_time: ", meetingData.start_time);     
+        if (meetingData) {
+            try {
+                const response = await fetch(`/meetings/${meetingId}/${loginEmail}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(meetingData),
+                });
 
+                const responseData = await response.text();
+                if (response.text) {
+                    //console.log("Meeting updated Response Data: ", responseData)
+                    window.alert("Meeting successfully updated");
+                } else {
+                    console.error("Error from server: ", responseData)
+                }
+            } catch (error) {
+                console.error('Error updating meeting:', error);
+            }
+        };
+    }
     const handleDelete = async () => {
         try {
             const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
@@ -104,34 +137,44 @@ const SingleCampaignPage = () => {
         }
     };
 
+    let formattedDateTime;
+    if (meetingData && meetingData.start_time) {
+        formattedDateTime = moment(meetingData.start_time).format('YYYY-MM-DDTHH:mm');
+        console.log("Formatted start time: ", formattedDateTime)
+    }
+    console.log("meetingData check: ", meetingData);
     return (
         <SingleCampaignContainer>
             <FormContainer>
-                <form onSubmit={(e) => { e.preventDefault(); handleUpdate(meetingData); }}>
-                    
+                <StyledForm onSubmit={(e) =>  handleUpdate(e)}>
                     {meetingData && (
                         <>
                             <input type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
-                            <input type="text" name="agenda" placeholder="Agenda" value={meetingData.agenda} onChange={handleInputChange} />
-                            <input type="datetime-local" name="start_time" value={formattedDateTime} onChange={handleInputChange} />
-                            <input type="text" name="timezone" placeholder="Timezone" value={meetingData.timezone} onChange={handleInputChange} />
-
+                            <Textarea name="agenda" placeholder="Agenda" value={meetingData.agenda} onChange={handleInputChange} />
+                            <input type="datetime-local" name="start_time" value={formattedDateTime || ''} onChange={handleInputChange} />
+                            <select name="timezone" value={meetingData.timezone} onChange={handleInputChange}>
+                                {TIMEZONES.map((zone) => (
+                                    <option key={zone} value={zone}>
+                                        {zone}
+                                    </option>
+                                ))}
+                            </select>
                             <button type="submit">Update Meeting</button>
                         </>
                     )}
-                </form>
+                </StyledForm>
             </FormContainer>
             <ActionContainer>
                 <a href={meetingData ? meetingData.join_url : '#'} target="_blank" rel="noopener noreferrer">
-                    <button>Join Meeting</button>
+                    <ActionButton>Join Meeting</ActionButton>
                 </a>
                 <a href={meetingData ? meetingData.start_url : '#'} target="_blank" rel="noopener noreferrer">
-                    <button>Start Meeting</button>
+                    <ActionButton>Start Meeting</ActionButton>
                 </a>
-                <button onClick={handleDelete}>Delete Meeting</button>
+                <ActionButton onClick={handleDelete}>Delete Meeting</ActionButton>
             </ActionContainer>
         </SingleCampaignContainer>
     );
+    
 };
-
 export default SingleCampaignPage;
