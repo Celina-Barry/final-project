@@ -5,6 +5,7 @@ import PastCampaigns from './PastCampaigns';
 
 
 const ItemContainer = styled.div`
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -17,20 +18,7 @@ const ItemBox = styled.div`
     text-align: center;
 `;
 
-const ItemImage = styled.img`
-    max-width: 100%;
-    height: auto;
-`;
 
-const ItemName = styled.p`
-    font-weight: bold;
-    margin-top: 10px;
-`;
-
-const ItemPrice = styled.p`
-    margin-top: 5px;
-    color: #777;
-`;
 
 const ItemLink = styled(Link)`
     display: inline-block;

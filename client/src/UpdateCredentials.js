@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const PageContainer = styled.div`
@@ -16,14 +16,29 @@ const FormContainer = styled.div`
     padding: 20px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    margin-bottom: 20px;
+   
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: 5px;
+    height: 500px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin: 20px;
+    background-color: var(--celeste);
 `;
 
 const Form = styled.form`
     display: flex;
     flex-direction: column;
 `;
-
+const FormHeading = styled.h2`
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 5px;
+    color: var(--secondary-color);
+    `;
 const Input = styled.input`
     margin-bottom: 15px;
     padding: 10px;
@@ -35,37 +50,64 @@ const SubmitButton = styled.button`
     padding: 10px;
     border-radius: 5px;
     border: none;
-    background-color: #007BFF;
+    background-color: var(--rose-red);
     color: white;
     cursor: pointer;
     margin-top: 10px;
     
     &:hover {
-        background-color: #0056b3;
-    }
+        background-color: var(--dodger-blue)
+            }
 `;
 
 const HomePageButton = styled(SubmitButton)`
-    background-color: #6c757d;
+    background-color: var(--rose-red);
 
     &:hover {
-        background-color: #565e64;
+        background-color: var(--dodger-blue);
     }
 `;
 
 const UpdateCredentialsForm = () => {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const loginEmail = localStorage.getItem('loginEmail');
+                const response = await fetch(`/users/${loginEmail}`);
+                const result = await response.json();
+    
+                if (result && result.status === 200) {
+                    setUserData(result.data);
+                    // Update form data with existing values
+                    setFormData({
+                        ...formData,
+                        account_id: result.data.zoom_account_id || '',
+                        client_id: result.data.client_id || '',
+                        client_secret: result.data.client_secret || ''
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+    
+        fetchData();
+    }, []);
+
+    const [userData, setUserData] = useState({});
+
     const [formData, setFormData] = useState({
-        accountId: '',
-        clientId: '',
-        clientSecret: '',
-        newPassword: '',
+        account_id: '',
+        client_id: '',
+        client_secret: '',
+        pw: '',
         confirmNewPassword: '',
     });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        if (formData.newPassword !== formData.confirmNewPassword) {
+        if (formData.pw !== formData.confirmNewPassword) {
             alert('Passwords do not match!');
             return;
         }
@@ -100,33 +142,34 @@ const UpdateCredentialsForm = () => {
     return (
         <PageContainer>
             <FormContainer>
+            <FormHeading>Edit Credentials </FormHeading>
                 <Form onSubmit={handleSubmit}>
                     <Input
                         type="text"
                         placeholder="Account ID"
-                        value={formData.accountId}
-                        onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                        value={formData.account_id}
+                        onChange={(e) => setFormData({ ...formData, account_id: e.target.value })}
                         required
                     />
                     <Input
                         type="text"
                         placeholder="Client ID"
-                        value={formData.clientId}
-                        onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+                        value={formData.client_id}
+                        onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
                         required
                     />
                     <Input
                         type="password"
                         placeholder="Client Secret"
-                        value={formData.clientSecret}
-                        onChange={(e) => setFormData({ ...formData, clientSecret: e.target.value })}
+                        value={formData.client_secret}
+                        onChange={(e) => setFormData({ ...formData, client_secret: e.target.value })}
                         required
                     />
                     <Input
                         type="password"
                         placeholder="New Password"
-                        value={formData.newPassword}
-                        onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                        value={formData.pw}
+                        onChange={(e) => setFormData({ ...formData, pw: e.target.value })}
                         required
                     />
                     <Input

@@ -67,7 +67,7 @@ const CreateMeeting = () => {
     return (
         <Wrapper>
             <FormContainer>
-            <FormHeading>Use the form below to create a meeting </FormHeading>
+            <FormHeading>Create a meeting </FormHeading>
 
             <MeetingForm onSubmit={(event) => handleSubmit(event, formData)}>
 
@@ -126,11 +126,15 @@ const CreateMeeting = () => {
     );
 };
 const FormContainer = styled.div`
+    padding-top: 20px;
     flex: 1;
     padding: 20px;
+    background-color: var(--celeste);
     box-shadow: var(--box-shadow);
     border-radius: 5px;
-    max-width: 400px;
+    width: 400px;
+    align-items: center;
+    justify-content: center;
     `;
 
 
@@ -152,7 +156,8 @@ const MeetingForm = styled.form`
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 100%;
+    width: 400px;
+    
 `;
 const FormHeading = styled.h2`
     font-size: 1.5rem;
@@ -169,17 +174,24 @@ const FormHeading = styled.h2`
 // `;
 
 const SubmitButton = styled.button`
-    color: var(--font-color);
-    background-color: var(--secondary-color);
-    padding: 10px 30px;
-    border: none;
-    border-radius: 5px;
-    transition: var(--transition);
-
-    &:hover {
-        background-color: var(--hover-color);
-        cursor: pointer;
-    }
+    background-color: var(--rose-red);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        font-family: var(--font-family);
+        &:hover {
+            background-color: var(--dodger-blue);
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+        &:active {
+            transform: translateY(0);
+        }
 
     &:disabled {
         color: var(--disabled-color);

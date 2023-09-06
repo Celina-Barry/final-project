@@ -2,8 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import moment from 'moment';
+import InputField from './InputField';
 
 import { TIMEZONES } from './ZoomTimezones';
+
+const Container = styled.div`
+    flex: 1;
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: 5px;
+    height: 500px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin: 20px;
+    background-color: var(--celeste);
+`;
 
 const SingleCampaignContainer = styled.div`
     display: flex;
@@ -21,19 +36,17 @@ const FormContainer = styled.div`
     padding: 20px;
     box-shadow: var(--box-shadow);
     border-radius: 5px;
-    max-width: 400px;
+    height: 500px;
+    width: 400px;
 `;
 const FormHeading = styled.h2`
     font-size: 1.5rem;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     color: var(--secondary-color);
     `;
-const ActionHeading = styled.h3`
-    text-align: center;
-    margin-bottom: 10px;
-    color: var(--secondary-color);
-`;
+
+
 const ActionContainer = styled.div`
     flex: 1;
     padding: 20px;
@@ -57,7 +70,8 @@ const Textarea = styled.textarea`
 `;
 
 const ActionButton = styled.button`
-    margin: 15px 0;
+    margin: 15px 10px;
+    display: inline-block;
 `;
 const GetInvitationButton = styled.button`
     margin: 15px 0;
@@ -172,10 +186,15 @@ const SingleCampaignPage = () => {
             };
 
     const confirmDelete = async (shouldDelete) => {
-        if (shouldDelete) {
+        if (!shouldDelete) {
+
+            setShowPopup(false);
+            return;
+        }
+    
             setShowPopup(true);
             setPopupMessage("Deleting...")
-        }
+        
         const loginEmail = localStorage.getItem('loginEmail');
         console.log("loginEmail: ", loginEmail, "meedingId: ", meetingId)
             try {
@@ -231,14 +250,14 @@ const SingleCampaignPage = () => {
 
     return (
         <SingleCampaignContainer>
-            <FormContainer>
-                <FormHeading>Use the form below to update </FormHeading>
+            <Container>
+                <FormHeading>Edit meeting details </FormHeading>
                 <StyledForm onSubmit={(e) =>  handleUpdate(e)}>
                     {meetingData && (
                         <>
-                            <input type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
+                            <InputField type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
                             <Textarea name="agenda" placeholder="Agenda" value={meetingData.agenda} onChange={handleInputChange} />
-                            <input type="datetime-local" name="start_time" value={formattedDateTime || ''} onChange={handleInputChange} />
+                            <InputField type="datetime-local" name="start_time" value={formattedDateTime || ''} onChange={handleInputChange} />
                             <select name="timezone" value={meetingData.timezone} onChange={handleInputChange}>
                                 {TIMEZONES.map((zone) => (
                                     <option key={zone} value={zone}>
@@ -250,16 +269,15 @@ const SingleCampaignPage = () => {
                         </>
                     )}
                 </StyledForm>
-            </FormContainer>
-            <ActionContainer>
-            <ActionHeading>Meeting Options</ActionHeading>
+            </Container>
+            <Container>
+            <FormHeading>Meeting Options</FormHeading>
 
-                <a href={meetingData ? meetingData.join_url : '#'} target="_blank" rel="noopener noreferrer">
-                    <ActionButton>Join Meeting</ActionButton>
-                </a>
-                <a href={meetingData ? meetingData.start_url : '#'} target="_blank" rel="noopener noreferrer">
-                    <ActionButton>Start Meeting</ActionButton>
-                </a>
+            <ActionButton onClick={() => window.open(meetingData ? meetingData.join_url : '#', '_blank')}>
+                Join Meeting
+            </ActionButton>
+                <ActionButton onClick={() => window.open(meetingData ? meetingData.start_url : '#', "_blank")}>
+                    Start Meeting</ActionButton>
                 <ActionButton 
                     onClick={() => {
                         setShowPopup(true);
@@ -273,7 +291,7 @@ const SingleCampaignPage = () => {
                         setShowInvitationPopup(true);
                         }}>Get Meeting Invitation
                     </ActionButton>
-            </ActionContainer>
+            </Container>
 
             {showPopup && (
                 <div style={{

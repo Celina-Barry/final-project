@@ -67,12 +67,14 @@ const DetailItem = styled.div`
 `;
 
 const DetailLabel = styled.div`
-    flex: 0 0 120px;
+    flex: 0 0 50px;
     font-weight: bold;
+    padding: 5px;
 `;
 
 const DetailValue = styled.div`
     flex: 1;
+    padding: 5px;
 `;
 const ButtonsContainer = styled.div`
     display: flex;

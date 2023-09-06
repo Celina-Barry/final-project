@@ -18,7 +18,7 @@ export default createGlobalStyle`
         --max-content-width: 1200px;
         --font-family: 'Roboto', sans-serif;
         --user-img-width: 120px;
-        --neutral-background: var(--celeste);
+        --neutral-background: var(--tiffany-blue);
         --danger-color: var(--burgundy);
         --box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
         --transition: all 0.3s cubic-bezier(.25,.8,.25,1);
@@ -57,7 +57,8 @@ export default createGlobalStyle`
         transition: var(--transition);
         &:hover {
             color: var(--primary-color);
-            text-decoration: underline;
+            text-decoration: none;
+            font-weight: bold;
         }
     }
 
@@ -79,7 +80,7 @@ export default createGlobalStyle`
         }
     }
 
-    textarea, select {
+    input, textarea, select {
         border: 2px solid var(--tiffany-blue);
         padding: 10px 15px;
         border-radius: 5px;

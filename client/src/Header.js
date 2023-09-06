@@ -1,6 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import Logout from './Logout';
+//import Logout from './Logout'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -10,6 +12,12 @@ const HeaderContainer = styled.div`
   background-color: var(--primary-color);
   color: #fff;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const CategoryLinks = styled.div`
@@ -26,11 +34,13 @@ const StyledNavLink = styled(NavLink)`
 
   &.active {
     font-weight: bold;
+    text-decoration: none;
     text-decoration: underline;
   }
 
   &:hover {
-    background-color: var(--secondary-color);
+    font-weight: bold;
+    color: #fff;
   }
 `;
 
@@ -43,6 +53,9 @@ const Header = () => {
         <StyledNavLink to="/pastmeetings" activeClassName="active">View Past Meetings</StyledNavLink>
         <StyledNavLink to="/updatecredentials" activeClassName="active">Update Credentials</StyledNavLink>
       </CategoryLinks>
+      <HeaderActions>
+        <Logout />
+      </HeaderActions>
     </HeaderContainer>
   );
 };

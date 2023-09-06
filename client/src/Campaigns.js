@@ -10,11 +10,23 @@ const ItemContainer = styled.div`
 `;
 
 const ItemBox = styled.div`
-    border: 1px solid #ddd;
+    border: 1px solid var(--tiffany-blue);
+    background-color: var(--celeste);
+    border-radius: 5px;
     padding: 20px;
     width: 250px;
     text-align: center;
     box-shadow: var(--box-shadow);
+    transition: var(--transition);
+        font-family: var(--font-family);
+        &:hover {
+            transform: translateY(-2px);
+            border-color: var(--rose-red);
+        }
+        &:focus {
+            border-color: var(--rose-red);
+            box-shadow: 0 0 8px 0 var(--rose-red);
+        }
 `;
 
 const ItemName = styled.p`
@@ -39,7 +51,9 @@ const ItemLink = styled.a`
     font-family: var(--font-family);
 
     &:hover {
-        background-color: #0056b3;
+        background-color: var(--dodger-blue);
+        color: white;
+        text-decoration: none;
     }
 `;
 const formatDate = (isoString) => {

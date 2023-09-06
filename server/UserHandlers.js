@@ -2,6 +2,7 @@
 const axios = require('axios');
 const qs = require('qs');
 const moment = require('moment');
+const Asana = require('asana');
 
 const { MongoClient, ObjectId } = require("mongodb");
 require("dotenv").config();
@@ -374,6 +375,9 @@ const getMeetings = async (req, res) => {
 
 const createMeeting = async (req, res) => {
     console.log("Create Meeting function called");
+    // const ASANA_BEARER_TOKEN = "1157497543118731";
+    // const ASANA_WORKSPACE_GID = "1157497543118737";
+    // const ASANA_PROJECT_GID = "1205429075631746";
     
     const MONGO_URI = "mongodb+srv://celinabarry:8Y9DQAAzsIUqHWXr@cluster0.e9wwre8.mongodb.net/?retryWrites=true&w=majority";
     console.log("MONGO_URI: ", MONGO_URI);
@@ -383,11 +387,11 @@ const createMeeting = async (req, res) => {
     console.log("Email parameter:", email);
     console.log("form body", req.body);
     
-    const client = new MongoClient(MONGO_URI, options);
+    const mongoClient = new MongoClient(MONGO_URI, options);
     
     try {
-        await client.connect();
-        const db = client.db('final-project');
+        await mongoClient.connect();
+        const db = mongoClient.db('final-project');
         
         // Retrieve user's data from MongoDB
         const user = await db.collection('users').findOne({ "email": email });
@@ -395,12 +399,26 @@ const createMeeting = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const { zoom_user_id, zoom_token } = user;
-
+     
+        const { zoom_user_id, token_expiry } = user;
+        let { zoom_token } = user;
+        const currentTime = Math.floor(Date.now() / 1000);
+        console.log("current time: ", currentTime, "token_expiry: ", token_expiry)
+        if (currentTime >= token_expiry) {
+            const refreshedUser = await refreshTokenForUser(email);
+            console.log("refreshed user: ", refreshedUser)
+            if (!refreshedUser) {
+                return res.status(500).json({ message: 'Error refreshing Zoom token' });
+            }
+            zoom_token = refreshedUser.data.zoom_token;
+            console.log("refreshedUser.data.zoom_token: ", refreshedUser.data.zoom_token)
+            console.log("refreshed zoom token: ", zoom_token)
+        }
         const zoomApiUrl = `https://api.zoom.us/v2/users/${zoom_user_id}/meetings`;
         const zoomApiHeaders = {
             'Authorization': `Bearer ${zoom_token}`,
             'Content-Type': 'application/json',
+            
         };
         const zoomMeetingData = {
             topic,
@@ -436,12 +454,33 @@ const createMeeting = async (req, res) => {
         });
 
         const zoomData = response.data;
+
+
+        // const asanaClient = Asana.Client.create().useAccessToken(ASANA_BEARER_TOKEN);
+
+        // const taskData = {
+        //     workspace: ASANA_WORKSPACE_GID,
+        //     projects: ASANA_PROJECT_GID,
+        //     name: `new meeting: ${topic}`,
+        //     notes: `Join URL: ${zoomData.join_url}\nMeeting ID: ${zoomData.id}\nAgenda: ${agenda}`,
+        //     due_on: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        // };
+
+        // const asanaTask = await asanaClient.tasks.create(taskData);
+
+        // const combinedData = {
+        //     zoom: zoomData,
+        //     asana: asanaTask.gid  // or asanaTask if you want to store the full task data.
+        // };
+        // await db.collection('Meetings').insertOne(combinedData);
+
         return res.status(201).json(zoomData);
+
     } catch (error) {
         console.error('Error creating Zoom meeting:', error);
         return res.status(500).json({ message: 'Error creating Zoom meeting' });
     } finally {
-        client.close();
+        mongoClient.close();
     }
 };
 
@@ -539,12 +578,12 @@ const createUser = async (req, res) => {
     console.log("MONGO_URI:", MONGO_URI);
     const client = new MongoClient(MONGO_URI, options);  
       
-      try {
+    try {
         await client.connect();
-  
-      const db = client.db("final-project");
-      console.log("New user handler req.body: ", req.body)
-      const { access_token, expires_in, tokenExpiryTimestamp, error } = await getToken(req.body.zoom_account_id, req.body.client_id, req.body.client_secret);
+        const db = client.db("final-project");
+        console.log("New user handler req.body: ", req.body)
+        const { access_token, expires_in, tokenExpiryTimestamp, error } = await getToken(req.body.zoom_account_id, req.body.client_id, req.body.client_secret);
+
       if (!access_token) {
         return res.status(400).json({
             status: 400,
@@ -576,6 +615,45 @@ const createUser = async (req, res) => {
     };
 
       await db.collection("users").insertOne(userDataToStore);
+    //   let defaultClient = Asana.ApiClient.instance;
+    //   console.log("defaultclient: ", defaultClient)
+    //   let oauth2 = defaultClient.authentications['oauth2'];
+    //   oauth2.accessToken = '1/1157497543118731:c98ee3a67fe8157abb192c95260ccfe2';
+    //   let apiInstance = new Asana.WorkspacesApi();
+      
+    //   let body = new Asana.WorkspaceGidAddUserBody.constructFromObject({
+    //     data: {
+    //       email: req.body.email
+    //     }
+    //   });
+  
+    //   let workspace_gid = "1157497543118737"; 
+    //   let opts = {
+    //     'opt_fields': ["email"]
+    //   };
+  
+    //   apiInstance.addUserForWyorkspace(workspace_gid, body, opts, (error, data, response) => {
+    //     if (error) {
+    //       console.error("Error adding user to Asana:", error);
+    //     } else {
+    //       console.log('User added to Asana workspace. Returned data:', JSON.stringify(data, null, 2));
+    //       let projectApi = new Asana.ProjectsApi();
+    //       let projectBody = new Asana.ProjectGidAddMembersBody.constructFromObject({ data: { user: workspaceData.gid } }); // Assuming the returned user gid is under workspaceData.gid
+    //       let project_gid = "1205429075631746";
+    //       let projectOpts = { 
+    //         'opt_fields': ["name", "email"] 
+    //       };
+  
+    //       projectApi.addMembersForProject(project_gid, projectBody, projectOpts, (projectError, projectData, projectResponse) => {
+    //         if (projectError) {
+    //           console.error("Error adding user to Asana project:", projectError);
+    //         } else {
+    //           console.log('User added to Asana project. Returned data:', JSON.stringify(projectData, null, 2));
+    //         }
+    //       });
+        // }
+    //   });
+  
       return res.status(201).json({ status: 201, data: req.body });
         
       } catch (err) {

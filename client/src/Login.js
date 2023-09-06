@@ -12,6 +12,7 @@ const PageContainer = styled.div`
 `;
 
 const FormContainer = styled.div`
+    background-color: var(--celeste);
     width: 100%;
     max-width: 500px;
     padding: 20px;
@@ -36,13 +37,13 @@ const SubmitButton = styled.button`
     padding: 10px;
     border-radius: 5px;
     border: none;
-    background-color: #007BFF;
+    background-color: var(--rose-red);
     color: white;
     cursor: pointer;
     margin-top: 10px;
     
     &:hover {
-        background-color: #0056b3;
+        background-color: var(--dodger-blue);
     }
 `;
 

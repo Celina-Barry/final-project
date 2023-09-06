@@ -6,14 +6,27 @@ import styled from 'styled-components';
 const Card = styled.div`
   width: 300px;
   margin: 50px auto;
-  padding: 20px;
+  padding: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  border: 1px solid var(--tiffany-blue);
+  background-color: var(--celeste);
+    border-radius: 5px;
+    width: 550px;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
 `;
-
+const ItemContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 50px;
+    
+`;
 const Button = styled.button`
   display: block;
   margin-top: 20px;
+  margin-bottom: 10px
 `;
 
 const SinglePastMeeting = () => {
@@ -45,7 +58,17 @@ const SinglePastMeeting = () => {
     
         fetchMeetingData();
     }, [meetingId]);
-
+    const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString(undefined, options);
+    };
+    
+    const formatTime = (isoString) => {
+        const date = new Date(isoString);
+        const options = { hour: '2-digit', minute: '2-digit' };
+        return date.toLocaleTimeString(undefined, options);
+    };
     const fetchParticipants = async () => {
         try {
             const response = await fetch(`/meetingparticipants/${meetingId}/${loginEmail}`);
@@ -67,13 +90,22 @@ const SinglePastMeeting = () => {
     return (
         <Card>
             <h2>{meetingData.topic}</h2>
+            <ItemContainer>
+            <p><strong>Meeting ID:</strong> {meetingData.id}</p>
             <p><strong>Duration:</strong> {meetingData.duration} minutes</p>
-            <p><strong>Total minutes:</strong> {meetingData.total_minutes}</p>
-            <p><strong>Participant Count:</strong> {meetingData.participants_count}</p>
+            <p><strong>Host Email:</strong> {meetingData.host_email}</p>
+            <p><strong>Date:</strong> {formatDate(meetingData.start_time)}</p>
+            <p><strong>Time:</strong> {formatTime(meetingData.start_time)}</p>
+            <p><strong>Timezone:</strong> {meetingData.timezone}</p>
+            {/* <p><strong>Total minutes:</strong> {meetingData.total_minutes}</p> */}
+            <p><strong>Participant Count:</strong> Upgrade to pro to get this feature{meetingData.participants_count}</p>
         
-            <Button onClick={fetchParticipants}>See past participants</Button>
+            {/* <Button onClick={fetchParticipants}>See past participants</Button> */}
+            
             <Button onClick={() => navigate('/pastmeetings')}>Return to past meetings</Button>
+            </ItemContainer>
         </Card>
+
     );
 };
 
