@@ -36,6 +36,13 @@ const ItemPrice = styled.p`
     margin-top: 5px;
     color: #777;
 `;
+const FormHeading = styled.h2`
+    padding-left: 30px;
+    font-size: 2.5rem;
+    text-align: left;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+    `;
 
 const ItemLink = styled(Link)`
     display: inline-block;
@@ -63,6 +70,7 @@ const Homepage = () => {
 
     return (
     <StyledHome>
+    <FormHeading>Upcoming Meetings </FormHeading>
 
         <ItemContainer>   
             <Campaigns />

@@ -33,7 +33,13 @@ const ItemLink = styled(Link)`
     background-color: #0056b3;
     }
 `;
-
+const FormHeading = styled.h2`
+    padding-left: 30px;
+    font-size: 2.5rem;
+    text-align: left;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+    `;
 const PageNumberContainer = styled.div`
     display: flex;
     justify-content: center;
@@ -46,6 +52,7 @@ const PastMeetingsPage = () => {
 
     return (
     <div>
+    <FormHeading>Past Meetings</FormHeading>
     <ItemContainer>   
         <PastCampaigns />
     </ItemContainer>

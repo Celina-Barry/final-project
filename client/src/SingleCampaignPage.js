@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import moment from 'moment';
-import InputField from './InputField';
+//import InputField from './InputField';
 
 import { TIMEZONES } from './ZoomTimezones';
 
@@ -255,9 +255,9 @@ const SingleCampaignPage = () => {
                 <StyledForm onSubmit={(e) =>  handleUpdate(e)}>
                     {meetingData && (
                         <>
-                            <InputField type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
+                            <input type="text" name="topic" placeholder="Topic" value={meetingData.topic} onChange={handleInputChange}  />
                             <Textarea name="agenda" placeholder="Agenda" value={meetingData.agenda} onChange={handleInputChange} />
-                            <InputField type="datetime-local" name="start_time" value={formattedDateTime || ''} onChange={handleInputChange} />
+                            <input type="datetime-local" name="start_time" value={formattedDateTime || ''} onChange={handleInputChange} />
                             <select name="timezone" value={meetingData.timezone} onChange={handleInputChange}>
                                 {TIMEZONES.map((zone) => (
                                     <option key={zone} value={zone}>
